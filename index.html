@@ -1,116 +1,235 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Проект 9 класс — Игра 2048</title>
-    <style>
-        body{
-            font-family: Arial, sans-serif;
-            background:#0f172a;
-            color:white;
-            text-align:center;
-            margin:0;
-            padding:0;
-        }
+<meta charset="UTF-8">
+<title>Проект по информатике — Игра 2048</title>
 
-        header{
-            background:#020617;
-            padding:20px;
-            font-size:28px;
-            font-weight:bold;
-        }
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#0f172a,#020617);
+    color:white;
+    text-align:center;
+}
 
-        .container{
-            padding:30px;
-        }
+header{
+    padding:30px;
+    font-size:32px;
+    font-weight:bold;
+    background:#020617;
+    box-shadow:0 0 20px black;
+}
 
-        .card{
-            background:#111827;
-            padding:25px;
-            margin:20px auto;
-            width:80%;
-            max-width:800px;
-            border-radius:15px;
-            box-shadow:0 0 20px rgba(0,0,0,0.4);
-        }
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:30px;
+}
 
-        button{
-            padding:15px 25px;
-            font-size:18px;
-            border:none;
-            border-radius:10px;
-            background:#22c55e;
-            color:white;
-            cursor:pointer;
-            margin-top:15px;
-        }
+.card{
+    background:#111827;
+    padding:25px;
+    border-radius:20px;
+    margin:20px 0;
+    box-shadow:0 0 25px rgba(0,0,0,0.6);
+}
 
-        button:hover{
-            background:#16a34a;
-        }
+button{
+    padding:18px 35px;
+    font-size:20px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(45deg,#22c55e,#16a34a);
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
 
-       iframe{
-            margin-top:20px;
-            width:100%;
-            height:600px;
-            border:none;
-            border-radius:10px;
-            background:white;
-        }
+button:hover{
+    transform:scale(1.05);
+}
 
-        footer{
-            margin-top:40px;
-            padding:20px;
-            background:#020617;
-            font-size:14px;
-            opacity:0.7;
-        }
-    </style>
+#game{
+    margin-top:30px;
+}
+
+/* ===== СТИЛИ ИГРЫ ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  grid-gap: 10px;
+  justify-content: center;
+  margin-top:20px;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  background: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  border-radius: 10px;
+}
+
+.score{
+  font-size:22px;
+  margin-top:15px;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-    Проект по информатике: Игра 2048
+Проект по информатике: игра 2048
 </header>
 
 <div class="container">
 
-    <div class="card">
-        <h2>Описание проекта</h2>
-        <p>
-            Данный сайт создан для демонстрации работы JavaScript и HTML.
-            В проекте реализована браузерная игра 2048.
-        </p>
-        <p>
-            Цель проекта — показать навыки работы с HTML, CSS и JavaScript.
-        </p>
-    </div>
+<div class="card">
+<h2>О проекте</h2>
+<p>
+Данный проект разработан на языке HTML, CSS и JavaScript.  
+Цель проекта — создать браузерную игру 2048 и продемонстрировать навыки веб-программирования.
+</p>
 
-    <div class="card">
-        <h2>Демонстрация скрипта</h2>
-        <p>Нажмите кнопку для запуска игры:</p>
-        <button onclick="startGame()">Запустить игру</button>
+<p>
+В ходе работы были изучены:
+<br>• основы JavaScript  
+<br>• работа с DOM  
+<br>• создание интерфейса сайта  
+<br>• публикация сайта через GitHub Pages
+</p>
 
-        <!-- iframe с игрой -->
-        <iframe id="gameFrame" src=""></iframe>
-    </div>
+<button onclick="startGame()">🚀 Запустить игру</button>
+</div>
+
+<div id="game"></div>
 
 </div>
 
-<footer>
-    Проект ученика 9 класса · 2026
-</footer>
-
 <script>
+let grid = [];
+let score = 0;
+
 function startGame(){
-    // сюда вставляешь ссылку на игру
-    document.getElementById("gameFrame").src = "game/index.html";
+document.getElementById("game").innerHTML = `
+<div class="card">
+<h2>Игра 2048</h2>
+<div class="score">Очки: <span id="score">0</span></div>
+<div class="grid" id="grid"></div>
+<p>Управление: стрелки на клавиатуре</p>
+</div>
+`;
+init();
+}
+
+function init(){
+grid = [
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0],
+[0,0,0,0]
+];
+score = 0;
+add();
+add();
+draw();
+}
+
+function draw(){
+const gridEl = document.getElementById("grid");
+gridEl.innerHTML="";
+for(let i=0;i<4;i++){
+for(let j=0;j<4;j++){
+let cell=document.createElement("div");
+cell.className="cell";
+cell.textContent = grid[i][j]===0 ? "" : grid[i][j];
+gridEl.appendChild(cell);
+}
+}
+document.getElementById("score").textContent=score;
+}
+
+function add(){
+let empty=[];
+for(let i=0;i<4;i++){
+for(let j=0;j<4;j++){
+if(grid[i][j]===0) empty.push({i,j});
+}}
+if(empty.length===0) return;
+let r = empty[Math.floor(Math.random()*empty.length)];
+grid[r.i][r.j]= Math.random()>0.9?4:2;
+}
+
+document.addEventListener("keydown", e=>{
+if(!document.getElementById("grid")) return;
+
+let moved=false;
+
+if(e.key==="ArrowLeft") moved=moveLeft();
+if(e.key==="ArrowRight") moved=moveRight();
+if(e.key==="ArrowUp") moved=moveUp();
+if(e.key==="ArrowDown") moved=moveDown();
+
+if(moved){
+add();
+draw();
+}
+});
+
+function moveLeft(){
+let moved=false;
+for(let i=0;i<4;i++){
+let arr = grid[i].filter(x=>x);
+for(let j=0;j<arr.length-1;j++){
+if(arr[j]===arr[j+1]){
+arr[j]*=2;
+score+=arr[j];
+arr[j+1]=0;
+}
+}
+arr = arr.filter(x=>x);
+while(arr.length<4) arr.push(0);
+if(grid[i].join()!=arr.join()) moved=true;
+grid[i]=arr;
+}
+return moved;
+}
+
+function moveRight(){
+rotate();rotate();
+let m=moveLeft();
+rotate();rotate();
+return m;
+}
+
+function moveUp(){
+rotate();rotate();rotate();
+let m=moveLeft();
+rotate();
+return m;
+}
+
+function moveDown(){
+rotate();
+let m=moveLeft();
+rotate();rotate();rotate();
+return m;
+}
+
+function rotate(){
+let newGrid=[[],[],[],[]];
+for(let i=0;i<4;i++)
+for(let j=0;j<4;j++)
+newGrid[i][j]=grid[3-j][i];
+grid=newGrid;
 }
 </script>
 
 </body>
 </html>
-
-
-
