@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Проект 9 класс — Игра 2048</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#0f172a;
+            color:white;
+            text-align:center;
+            margin:0;
+            padding:0;
+        }
+
+        header{
+            background:#020617;
+            padding:20px;
+            font-size:28px;
+            font-weight:bold;
+        }
+
+        .container{
+            padding:30px;
+        }
+
+        .card{
+            background:#111827;
+            padding:25px;
+            margin:20px auto;
+            width:80%;
+            max-width:800px;
+            border-radius:15px;
+            box-shadow:0 0 20px rgba(0,0,0,0.4);
+        }
+
+        button{
+            padding:15px 25px;
+            font-size:18px;
+            border:none;
+            border-radius:10px;
+            background:#22c55e;
+            color:white;
+            cursor:pointer;
+            margin-top:15px;
+        }
+
+        button:hover{
+            background:#16a34a;
+        }
+
+        iframe{
+            margin-top:20px;
+            width:100%;
+            height:600px;
+            border:none;
+            border-radius:10px;
+            background:white;
+        }
+
+        footer{
+            margin-top:40px;
+            padding:20px;
+            background:#020617;
+            font-size:14px;
+            opacity:0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    Проект по информатике: Игра 2048
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Описание проекта</h2>
+        <p>
+            Данный сайт создан для демонстрации работы JavaScript и HTML.
+            В проекте реализована браузерная игра 2048.
+        </p>
+        <p>
+            Цель проекта — показать навыки работы с HTML, CSS и JavaScript.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Демонстрация скрипта</h2>
+        <p>Нажмите кнопку для запуска игры:</p>
+        <button onclick="startGame()">Запустить игру</button>
+
+        <!-- iframe с игрой -->
+        <iframe id="gameFrame" src=""></iframe>
+    </div>
+
+</div>
+
+<footer>
+    Проект ученика 9 класса · 2026
+</footer>
+
+<script>
+function startGame(){
+    // сюда вставляешь ссылку на игру
+    document.getElementById("gameFrame").src = "game/index.html";
+}
+</script>
+
+</body>
+</html>
