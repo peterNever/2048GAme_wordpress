@@ -1,644 +1,129 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2048</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            padding: 20px;
-        }
-        
-        .container {
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            color: white;
-        }
-        
-        .title {
-            font-size: 70px;
-            font-weight: bold;
-            color: #f2b179;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
-        .scores-container {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .score-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 20px;
-            border-radius: 5px;
-            min-width: 100px;
-        }
-        
-        .score-title {
-            font-size: 14px;
-            color: #eee;
-            margin-bottom: 5px;
-        }
-        
-        .score-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .game-intro {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 5px;
-            color: #eee;
-            margin-bottom: 20px;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        
-        .game-container {
-            position: relative;
-            background: rgba(187, 173, 160, 0.5);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
-            background: rgba(187, 173, 160, 1);
-            border-radius: 6px;
-            padding: 10px;
-            position: relative;
-        }
-        
-        .grid-cell {
-            width: 100%;
-            aspect-ratio: 1;
-            background: rgba(238, 228, 218, 0.35);
-            border-radius: 5px;
-        }
-        
-        .tile-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 10px;
-        }
-        
-        .tile {
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: calc(25% - 10px);
-            aspect-ratio: 1;
-            background: #eee4da;
-            border-radius: 5px;
-            font-size: 32px;
-            font-weight: bold;
-            transition: all 0.15s ease;
-            z-index: 10;
-        }
-        
-        /* Цаета для плиток с разными значениями */
-        .tile-2 { background: #eee4da; color: #776e65; }
-        .tile-4 { background: #ede0c8; color: #776e65; }
-        .tile-8 { background: #f2b179; color: #f9f6f2; }
-        .tile-16 { background: #f59563; color: #f9f6f2; }
-        .tile-32 { background: #f67c5f; color: #f9f6f2; }
-        .tile-64 { background: #f65e3b; color: #f9f6f2; }
-        .tile-128 { background: #edcf72; color: #f9f6f2; font-size: 28px; }
-        .tile-256 { background: #edcc61; color: #f9f6f2; font-size: 28px; }
-        .tile-512 { background: #edc850; color: #f9f6f2; font-size: 28px; }
-        .tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 24px; }
-        .tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 24px; }
-        
-        .game-message {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 10px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .game-message p {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #776e65;
-        }
-        
-        .win-message { color: #f67c5f; }
-        .game-over-message { color: #776e65; }
-        
-        .restart-button {
-            background: #8f7a66;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 12px 25px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .restart-button:hover {
-            background: #9f8b76;
-        }
-        
-        .controls {
-            margin-top: 20px;
-            color: #eee;
-            font-size: 16px;
-        }
-        
-        .controls h3 {
-            margin-bottom: 10px;
-            color: #f2b179;
-        }
-        
-        .key {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 4px;
-            margin: 0 5px;
-            font-weight: bold;
-        }
-        
-        @media (max-width: 520px) {
-            .title {
-                font-size: 50px;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .tile {
-                font-size: 24px;
-            }
-            
-            .tile-128, .tile-256, .tile-512 {
-                font-size: 22px;
-            }
-            
-            .tile-1024, .tile-2048 {
-                font-size: 18px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2048 Game</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #faf8ef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+#game-container {
+  width: 400px;
+  height: 400px;
+  background: #bbada0;
+  border-radius: 6px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+}
+.tile {
+  width: 80px;
+  height: 80px;
+  background: #cdc1b4;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #776e65;
+}
+.tile-2 { background: #eee4da; }
+.tile-4 { background: #ede0c8; }
+.tile-8 { background: #f2b179; color: #f9f6f2; }
+.tile-16 { background: #f59563; color: #f9f6f2; }
+.tile-32 { background: #f67c5f; color: #f9f6f2; }
+.tile-64 { background: #f65e3b; color: #f9f6f2; }
+.tile-128 { background: #edcf72; color: #f9f6f2; }
+.tile-256 { background: #edcc61; color: #f9f6f2; }
+.tile-512 { background: #edc850; color: #f9f6f2; }
+.tile-1024 { background: #edc53f; color: #f9f6f2; }
+.tile-2048 { background: #edc22e; color: #f9f6f2; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">2048</h1>
-            <div class="scores-container">
-                <div class="score-box">
-                    <div class="score-title">СЧЕТ</div>
-                    <div class="score-value" id="score">0</div>
-                </div>
-                <div class="score-box">
-                    <div class="score-title">РЕКОРД</div>
-                    <div class="score-value" id="best-score">0</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="game-intro">
-            Объединяйте плитки с одинаковыми числами, чтобы получить плитку 2048!
-        </div>
-        
-        <div class="game-container">
-            <div class="grid-container">
-                <!-- Сетка 4x4 -->
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                
-                <div class="tile-container" id="tile-container">
-                    <!-- Плитки будут добавляться с помощью JavaScript -->
-                </div>
-            </div>
-            
-            <div class="game-message" id="game-message">
-                <p id="message-text"></p>
-                <button class="restart-button" id="restart-button">Новая игра</button>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <h3>Управление</h3>
-            <p>Используйте <span class="key">←</span> <span class="key">→</span> <span class="key">↑</span> <span class="key">↓</span> на клавиатуре или свайпы на мобильном устройстве</p>
-        </div>
-    </div>
+<div id="game-container"></div>
 
-    <script>
-        // Игровые переменные
-        let grid = [];
-        let score = 0;
-        let bestScore = localStorage.getItem('bestScore2048') || 0;
-        let gameOver = false;
-        let won = false;
-        
-        // DOM элементы
-        const gridSize = 4;
-        const tileContainer = document.getElementById('tile-container');
-        const scoreElement = document.getElementById('score');
-        const bestScoreElement = document.getElementById('best-score');
-        const gameMessage = document.getElementById('game-message');
-        const messageText = document.getElementById('message-text');
-        const restartButton = document.getElementById('restart-button');
-        
-        // Инициализация игры
-        function initGame() {
-            // Создаем пустую сетку 4x4
-            grid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
-            
-            // Сбрасываем счет
-            score = 0;
-            scoreElement.textContent = score;
-            bestScoreElement.textContent = bestScore;
-            
-            // Сбрасываем состояние игры
-            gameOver = false;
-            won = false;
-            
-            // Очищаем контейнер с плитками
-            tileContainer.innerHTML = '';
-            
-            // Скрываем сообщение о результате игры
-            gameMessage.style.display = 'none';
-            
-            // Добавляем две начальные плитки
-            addRandomTile();
-            addRandomTile();
-            
-            // Отрисовываем сетку
-            updateGrid();
-        }
-        
-        // Добавление случайной плитки (2 или 4)
-        function addRandomTile() {
-            const emptyCells = [];
-            
-            // Находим все пустые ячейки
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    if (grid[row][col] === 0) {
-                        emptyCells.push({row, col});
-                    }
-                }
-            }
-            
-            // Если есть пустые ячейки, добавляем случайную плитку
-            if (emptyCells.length > 0) {
-                const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                // 90% шанс на плитку 2, 10% на плитку 4
-                grid[randomCell.row][randomCell.col] = Math.random() < 0.9 ? 2 : 4;
-            }
-        }
-        
-        // Отрисовка сетки и плиток
-        function updateGrid() {
-            // Очищаем контейнер с плитками
-            tileContainer.innerHTML = '';
-            
-            // Проходим по всем ячейкам и создаем плитки
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    const value = grid[row][col];
-                    
-                    if (value !== 0) {
-                        const tile = document.createElement('div');
-                        tile.className = `tile tile-${value}`;
-                        tile.textContent = value;
-                        
-                        // Устанавливаем позицию плитки
-                        tile.style.left = `${col * 25 + 10}%`;
-                        tile.style.top = `${row * 25 + 10}%`;
-                        
-                        tileContainer.appendChild(tile);
-                    }
-                }
-            }
-            
-            // Обновляем счет
-            scoreElement.textContent = score;
-            
-            // Проверяем условия окончания игры
-            checkGameStatus();
-        }
-        
-        // Движение плиток
-        function move(direction) {
-            if (gameOver) return false;
-            
-            // Сохраняем предыдущее состояние для проверки изменений
-            const previousGrid = JSON.parse(JSON.stringify(grid));
-            let moved = false;
-            
-            // В зависимости от направления применяем соответствующий алгоритм движения
-            switch(direction) {
-                case 'left':
-                    moved = moveLeft();
-                    break;
-                case 'right':
-                    moved = moveRight();
-                    break;
-                case 'up':
-                    moved = moveUp();
-                    break;
-                case 'down':
-                    moved = moveDown();
-                    break;
-            }
-            
-            // Если движение произошло, добавляем новую плитку и обновляем отображение
-            if (moved) {
-                addRandomTile();
-                updateGrid();
-                
-                // Проверяем, не достигли ли мы 2048
-                if (!won && hasWon()) {
-                    won = true;
-                    showMessage('Вы выиграли!', true);
-                }
-                
-                // Обновляем рекорд
-                if (score > bestScore) {
-                    bestScore = score;
-                    localStorage.setItem('bestScore2048', bestScore);
-                    bestScoreElement.textContent = bestScore;
-                }
-            }
-            
-            return moved;
-        }
-        
-        // Движение влево
-        function moveLeft() {
-            let moved = false;
-            
-            for (let row = 0; row < gridSize; row++) {
-                // Убираем нули и объединяем одинаковые плитки
-                const newRow = [];
-                let previousValue = null;
-                
-                for (let col = 0; col < gridSize; col++) {
-                    const value = grid[row][col];
-                    
-                    if (value !== 0) {
-                        if (previousValue === value) {
-                            // Объединение плиток
-                            newRow[newRow.length - 1] = value * 2;
-                            score += value * 2;
-                            previousValue = null;
-                            moved = true;
-                        } else {
-                            newRow.push(value);
-                            previousValue = value;
-                            // Проверяем, сдвинулась ли плитка
-                            if (newRow.length - 1 !== col) moved = true;
-                        }
-                    }
-                }
-                
-                // Заполняем оставшиеся ячейки нулями
-                while (newRow.length < gridSize) {
-                    newRow.push(0);
-                }
-                
-                grid[row] = newRow;
-            }
-            
-            return moved;
-        }
-        
-        // Движение вправо (аналогично движению влево, но в обратном порядке)
-        function moveRight() {
-            // Поворачиваем матрицу на 180 градусов, применяем moveLeft, затем поворачиваем обратно
-            rotateGrid(180);
-            const moved = moveLeft();
-            rotateGrid(180);
-            return moved;
-        }
-        
-        // Движение вверх
-        function moveUp() {
-            // Поворачиваем матрицу на 90 градусов против часовой стрелки, применяем moveLeft, затем поворачиваем обратно
-            rotateGrid(270);
-            const moved = moveLeft();
-            rotateGrid(90);
-            return moved;
-        }
-        
-        // Движение вниз
-        function moveDown() {
-            // Поворачиваем матрицу на 90 градусов по часовой стрелке, применяем moveLeft, затем поворачиваем обратно
-            rotateGrid(90);
-            const moved = moveLeft();
-            rotateGrid(270);
-            return moved;
-        }
-        
-        // Поворот матрицы (для реализации движений вверх/вниз)
-        function rotateGrid(degrees) {
-            const newGrid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
-            
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    switch(degrees) {
-                        case 90:
-                            newGrid[col][gridSize - 1 - row] = grid[row][col];
-                            break;
-                        case 180:
-                            newGrid[gridSize - 1 - row][gridSize - 1 - col] = grid[row][col];
-                            break;
-                        case 270:
-                            newGrid[gridSize - 1 - col][row] = grid[row][col];
-                            break;
-                    }
-                }
-            }
-            
-            grid = newGrid;
-        }
-        
-        // Проверка на победу (достижение плитки 2048)
-        function hasWon() {
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    if (grid[row][col] === 2048) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        
-        // Проверка на окончание игры
-        function checkGameStatus() {
-            // Проверяем, есть ли пустые ячейки
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    if (grid[row][col] === 0) {
-                        return; // Есть пустые ячейки, игра продолжается
-                    }
-                }
-            }
-            
-            // Проверяем, возможны ли ходы (есть ли соседние одинаковые плитки)
-            for (let row = 0; row < gridSize; row++) {
-                for (let col = 0; col < gridSize; col++) {
-                    const value = grid[row][col];
-                    
-                    // Проверяем соседние ячейки
-                    if (col < gridSize - 1 && grid[row][col + 1] === value) return;
-                    if (row < gridSize - 1 && grid[row + 1][col] === value) return;
-                }
-            }
-            
-            // Если нет пустых ячеек и нет возможных ходов - игра окончена
-            gameOver = true;
-            showMessage('Игра окончена!', false);
-        }
-        
-        // Показ сообщения о победе или поражении
-        function showMessage(text, isWin) {
-            messageText.textContent = text;
-            messageText.className = isWin ? 'win-message' : 'game-over-message';
-            gameMessage.style.display = 'flex';
-        }
-        
-        // Обработка нажатий клавиш
-        function handleKeyDown(event) {
-            event.preventDefault();
-            
-            switch(event.key) {
-                case 'ArrowLeft':
-                    move('left');
-                    break;
-                case 'ArrowRight':
-                    move('right');
-                    break;
-                case 'ArrowUp':
-                    move('up');
-                    break;
-                case 'ArrowDown':
-                    move('down');
-                    break;
-            }
-        }
-        
-        // Обработка свайпов (для мобильных устройств)
-        let touchStartX, touchStartY;
-        
-        function handleTouchStart(event) {
-            touchStartX = event.touches[0].clientX;
-            touchStartY = event.touches[0].clientY;
-            event.preventDefault();
-        }
-        
-        function handleTouchMove(event) {
-            if (!touchStartX || !touchStartY) return;
-            
-            const touchEndX = event.touches[0].clientX;
-            const touchEndY = event.touches[0].clientY;
-            
-            const dx = touchEndX - touchStartX;
-            const dy = touchEndY - touchStartY;
-            
-            // Определяем направление свайпа
-            if (Math.abs(dx) > Math.abs(dy)) {
-                // Горизонтальный свайп
-                if (dx > 0) {
-                    move('right');
-                } else {
-                    move('left');
-                }
-            } else {
-                // Вертикальный свайп
-                if (dy > 0) {
-                    move('down');
-                } else {
-                    move('up');
-                }
-            }
-            
-            // Сбрасываем начальные координаты
-            touchStartX = null;
-            touchStartY = null;
-            
-            event.preventDefault();
-        }
-        
-        // Инициализация при загрузке страницы
-        window.addEventListener('DOMContentLoaded', () => {
-            initGame();
-            
-            // Добавляем обработчики событий
-            document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('touchstart', handleTouchStart);
-            document.addEventListener('touchmove', handleTouchMove);
-            
-            // Обработка кнопки перезапуска
-            restartButton.addEventListener('click', initGame);
-        });
-    </script>
+<script>
+const size = 4;
+let board = [];
+
+function initBoard() {
+  board = Array.from({length: size}, () => Array(size).fill(0));
+  addTile();
+  addTile();
+  drawBoard();
+}
+
+function addTile() {
+  let empty = [];
+  for (let i=0;i<size;i++) {
+    for (let j=0;j<size;j++) {
+      if (board[i][j]===0) empty.push([i,j]);
+    }
+  }
+  if (!empty.length) return;
+  let [i,j] = empty[Math.floor(Math.random()*empty.length)];
+  board[i][j] = Math.random()<0.9 ? 2 : 4;
+}
+
+function drawBoard() {
+  const container = document.getElementById('game-container');
+  container.innerHTML = '';
+  for (let i=0;i<size;i++) {
+    for (let j=0;j<size;j++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile' + (board[i][j] ? ' tile-' + board[i][j] : '');
+      tile.textContent = board[i][j] || '';
+      container.appendChild(tile);
+    }
+  }
+}
+
+function slide(row) {
+  row = row.filter(v=>v);
+  for (let i=0;i<row.length-1;i++) {
+    if (row[i]===row[i+1]) { row[i]*=2; row[i+1]=0; }
+  }
+  row = row.filter(v=>v);
+  while(row.length<size) row.push(0);
+  return row;
+}
+
+function rotate(b) { return b[0].map((_,i)=>b.map(r=>r[i]).reverse()); }
+
+function move(dir) {
+  let rotated = false;
+  if(dir==='up'){ board=rotate(board); rotated=true; }
+  if(dir==='down'){ board=rotate(board); board=rotate(board); board=rotate(board); rotated=true; }
+  if(dir==='right'){ board=board.map(r=>r.reverse()); }
+
+  board = board.map(r=>slide(r));
+
+  if(dir==='up' && rotated) board=rotate(rotate(rotate(board)));
+  if(dir==='down' && rotated) board=rotate(board);
+  if(dir==='right') board=board.map(r=>r.reverse());
+
+  addTile();
+  drawBoard();
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowUp') move('up');
+  else if(e.key==='ArrowDown') move('down');
+  else if(e.key==='ArrowLeft') move('left');
+  else if(e.key==='ArrowRight') move('right');
+});
+
+initBoard();
+</script>
 </body>
 </html>
