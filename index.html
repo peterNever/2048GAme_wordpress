@@ -257,10 +257,51 @@ for(let j=0;j<4;j++)
 newGrid[i][j]=grid[3-j][i];
 grid=newGrid;
 }
+// 📱 управление свайпами на телефоне
+let startX = 0;
+let startY = 0;
+
+document.addEventListener("touchstart", e=>{
+startX = e.touches[0].clientX;
+startY = e.touches[0].clientY;
+},{passive:false});
+
+document.addEventListener("touchend", e=>{
+let endX = e.changedTouches[0].clientX;
+let endY = e.changedTouches[0].clientY;
+
+let dx = endX - startX;
+let dy = endY - startY;
+
+// минимальная длина свайпа
+if(Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
+
+if(Math.abs(dx) > Math.abs(dy)){
+// горизонтальный
+if(dx > 0){
+moveRight();
+}else{
+moveLeft();
+}
+}else{
+// вертикальный
+if(dy > 0){
+moveDown();
+}else{
+moveUp();
+}
+}
+
+add();
+draw();
+
+},{passive:false});
+
 </script>
 
 
 </body>
 </html>
+
 
 
