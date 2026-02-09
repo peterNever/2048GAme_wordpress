@@ -138,6 +138,9 @@ grid = [
 score = 0;
 add();
 add();
+draw();
+}
+
 function draw(){
 const gridEl = document.getElementById("grid");
 gridEl.innerHTML="";
@@ -150,7 +153,6 @@ let cell=document.createElement("div");
 cell.className="cell";
 cell.textContent = val===0 ? "" : val;
 
-// цвета как в настоящей 2048
 const colors={
 2:"#eee4da",
 4:"#ede0c8",
@@ -176,22 +178,6 @@ gridEl.appendChild(cell);
 
 document.getElementById("score").textContent=score;
 }
-;
-}
-
-function draw(){
-const gridEl = document.getElementById("grid");
-gridEl.innerHTML="";
-for(let i=0;i<4;i++){
-for(let j=0;j<4;j++){
-let cell=document.createElement("div");
-cell.className="cell";
-cell.textContent = grid[i][j]===0 ? "" : grid[i][j];
-gridEl.appendChild(cell);
-}
-}
-document.getElementById("score").textContent=score;
-}
 
 function add(){
 let empty=[];
@@ -207,25 +193,9 @@ grid[r.i][r.j]= Math.random()>0.9?4:2;
 document.addEventListener("keydown", e=>{
 if(!document.getElementById("grid")) return;
 
-// отключаем прокрутку страницы стрелками
 if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)){
-    e.preventDefault();
+e.preventDefault();
 }
-
-let moved=false;
-
-if(e.key==="ArrowLeft") moved=moveLeft();
-if(e.key==="ArrowRight") moved=moveRight();
-if(e.key==="ArrowUp") moved=moveUp();
-if(e.key==="ArrowDown") moved=moveDown();
-
-if(moved){
-add();
-draw();
-}
-});
-
-if(!document.getElementById("grid")) return;
 
 let moved=false;
 
@@ -289,6 +259,8 @@ grid=newGrid;
 }
 </script>
 
+
 </body>
 </html>
+
 
